@@ -9,7 +9,7 @@ public class Character {
     private String nickname;
     private String name;
     private String avatar;
-    List<Medalla> medallas;
+    LinkedList<Medalla> medallas;
 
     public Character(){}
     public Character(String nickname, String name)
@@ -35,7 +35,7 @@ public class Character {
     {
         medallas.add(medalla);
     }
-    public List<Medalla> getMedallasCharacter(){return medallas;}
+    public LinkedList<Medalla> getMedallasCharacter(){return medallas;}
     public void addMedallas(LinkedList<Medalla> medallas)
     {
         this.medallas = medallas;

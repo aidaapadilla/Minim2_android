@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -24,18 +25,22 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.Body;
 
 public class Perfil extends AppCompatActivity {
-    static final String BASE_URL = "http://10.0.2.2:8080/dsaApp/";
     private RecyclerView recyclerView;
     private AdapterPerfil mAdapter;
     private RecyclerView.LayoutManager layoutManager;
-    UserService API;
+
     ImageView avatarImg;
     TextView name;
     TextView nickname; //Aqui es on hauria d'estar el recycler view
     private Character user;
+
+    Context context;
+    SharedPreferences sharedPref;
     View viewprofile;
+    UserService API;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,7 +75,9 @@ public class Perfil extends AppCompatActivity {
     }
 
     public void doApiCall(String name) {
+        Character c = new Character();
         Call<Character> call = API.getUser(name);
+
         call.enqueue(new Callback<Character>() {
             @Override
             public void onResponse(Call<Character> call, Response<Character> response) {
@@ -88,7 +95,12 @@ public class Perfil extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<Character> call, Throwable t) {
-
+                t.printStackTrace();
+                Context context = getApplicationContext();
+                String text = "Error";
+                int duration = Toast.LENGTH_SHORT;
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
             }
         });
     }

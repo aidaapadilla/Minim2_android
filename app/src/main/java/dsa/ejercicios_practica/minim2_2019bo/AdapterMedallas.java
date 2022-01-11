@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import dsa.ejercicios_practica.minim2_2019bo.models.Medalla;
 
 public class AdapterMedallas extends RecyclerView.Adapter<AdapterMedallas.ViewHolder>{
-    private List<Medalla> medallas;
+    private LinkedList<Medalla> medallas;
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView txtName;
         public ImageView imgInsignea;
@@ -28,7 +28,7 @@ public class AdapterMedallas extends RecyclerView.Adapter<AdapterMedallas.ViewHo
             imgInsignea = (ImageView) itemView.findViewById(R.id.imgObject);
         }
     }
-    public void setData(List<Medalla> myDataset) {
+    public void setData(LinkedList<Medalla> myDataset) {
         medallas = myDataset;
         notifyDataSetChanged();
     }

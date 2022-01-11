@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import dsa.ejercicios_practica.minim2_2019bo.models.*;
@@ -28,7 +29,7 @@ public class MedallasRecyclerView extends AppCompatActivity {
     private AdapterMedallas mAdapter;
     private RecyclerView.LayoutManager layoutManager;
     InsigniasService API;
-    List<Medalla> medallas;
+    static LinkedList<Medalla> medallas2 = new LinkedList<Medalla>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,13 +59,13 @@ public class MedallasRecyclerView extends AppCompatActivity {
         API = retrofit.create(InsigniasService.class);
     }
     public void doApiCall(){
-        Call<List<Medalla>> call = API.getInsignias(medallas);
-        call.enqueue(new Callback<List<Medalla>>() {
+        Call<LinkedList<Medalla>> call = API.getInsignias();
+        call.enqueue(new Callback<LinkedList<Medalla>>() {
             @Override
-            public void onResponse(Call<List<Medalla>> call, Response<List<Medalla>> response) {
+            public void onResponse(Call<LinkedList<Medalla>> call, Response<LinkedList<Medalla>> response) {
                 if(response.code()==200) {
-                    medallas=response.body();
-                    mAdapter.setData(medallas);
+                    medallas2=response.body();
+                    mAdapter.setData(medallas2);
                 }
                 else {
                     Toast toast = Toast.makeText(MedallasRecyclerView.this,"Medallas no encontradas",Toast.LENGTH_SHORT);
@@ -74,7 +75,7 @@ public class MedallasRecyclerView extends AppCompatActivity {
                 }}
 
             @Override
-            public void onFailure(Call<List<Medalla>> call, Throwable t) {
+            public void onFailure(Call<LinkedList<Medalla>> call, Throwable t) {
                 Toast toast = Toast.makeText(MedallasRecyclerView.this,"ERROR DE CONEXIÓN, no se ha podido realizar la petición.",Toast.LENGTH_SHORT);
                 toast.show();
             }
