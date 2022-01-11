@@ -1,0 +1,67 @@
+package dsa.ejercicios_practica.minim2_2019bo;
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import dsa.ejercicios_practica.minim2_2019bo.models.Repositorio;
+
+public class AdapterGitHub extends RecyclerView.Adapter<AdapterGitHub.ViewHolder>{
+    private List<Repositorio> repositorioList;
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public TextView txtName; //name of the repository
+        public TextView txtLanguage;
+        public View layout;
+
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            layout = itemView;
+            txtName = (TextView) itemView.findViewById(R.id.repositoryTxt);
+            txtLanguage = (TextView) itemView.findViewById(R.id.languageTxt);
+        }
+    }
+    public void setData(List<Repositorio> myDataset) {
+        repositorioList = myDataset;
+        notifyDataSetChanged();
+    }
+
+    public void add(int position, Repositorio item) {
+        repositorioList.add(position, item);
+        notifyItemInserted(position);
+    }
+
+    @NonNull
+    @Override
+    public AdapterGitHub.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // create a new view
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        View v = inflater.inflate(R.layout.activity_row_layout_medallas, parent, false);
+        // set the view's size, margins, paddings and layout parameters
+        AdapterGitHub.ViewHolder vh = new AdapterGitHub.ViewHolder(v);
+        return vh;
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        Repositorio repositorio = repositorioList.get(position);
+        String name = repositorio.getRepositoryName();
+        String language = repositorio.getLanguage();
+        holder.txtName.setText(name);
+        holder.txtLanguage.setText(language);
+    }
+
+
+    @Override
+    public int getItemCount() {
+        return repositorioList.size();
+    }
+}

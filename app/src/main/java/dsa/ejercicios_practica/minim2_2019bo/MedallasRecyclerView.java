@@ -1,21 +1,29 @@
 package dsa.ejercicios_practica.minim2_2019bo;
-import dsa.ejercicios_practica.minim2_2019bo.services.*;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import dsa.ejercicios_practica.minim2_2019bo.models.*;
+import dsa.ejercicios_practica.minim2_2019bo.services.GithubService;
 import dsa.ejercicios_practica.minim2_2019bo.services.InsigniasService;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -25,26 +33,43 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class MedallasRecyclerView extends AppCompatActivity {
+    AlertDialog.Builder alertBuilder = null;
     private RecyclerView recyclerView;
-    private AdapterMedallas mAdapter;
+    private AdapterGitHub mAdapter;
+
     private RecyclerView.LayoutManager layoutManager;
-    InsigniasService API;
-    static LinkedList<Medalla> medallas2 = new LinkedList<Medalla>();
+    GithubService API;
+    static List<Repositorio> repositorioList = new LinkedList<Repositorio>();
+    ProgressBar progressBar;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recycler_view);
-        Intent intent = getIntent();
 
         recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+
+        alertBuilder = new AlertDialog.Builder(this);
+
         recyclerView.setHasFixedSize(true);
+        // use a linear layout manager
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        mAdapter = new AdapterMedallas();
-        recyclerView.setAdapter(mAdapter);
 
+        mAdapter = new AdapterGitHub();
+        recyclerView.setAdapter(mAdapter);
         createAPI();
-        doApiCall();
+
+        //Progress bar
+        progressBar.setVisibility(View.VISIBLE);
+        SharedPreferences sharedPreferences = getSharedPreferences("user", Context.MODE_PRIVATE);
+        String username = sharedPreferences.getString("name",null);
+        doApiCallRepositories(username);
+        doApiCall(username);
+        progressBar.setVisibility(View.INVISIBLE);
+
     }
     public void createAPI(){
         Gson gson = new GsonBuilder()
@@ -56,31 +81,84 @@ public class MedallasRecyclerView extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
-        API = retrofit.create(InsigniasService.class);
+        API = retrofit.create(GithubService.class);
     }
-    public void doApiCall(){
-        Call<LinkedList<Medalla>> call = API.getInsignias();
-        call.enqueue(new Callback<LinkedList<Medalla>>() {
+    public void doApiCall(String name){
+        Call<JsonObject> call = API.getUser(name);
+        call.enqueue(new Callback<JsonObject>() {
             @Override
-            public void onResponse(Call<LinkedList<Medalla>> call, Response<LinkedList<Medalla>> response) {
-                if(response.code()==200) {
-                    medallas2=response.body();
-                    mAdapter.setData(medallas2);
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if(response.isSuccessful()){
+                    try{
+                        User user = new User();
+                        JSONObject jsonObject = null;
+                        jsonObject = new JSONObject(new Gson().toJson(response.body()));
+                        user.setFollowers(Integer.parseInt(jsonObject.getString("followers")));
+                        user.setName(jsonObject.getString("login"));
+                        user.setFollowing(Integer.parseInt(jsonObject.getString("following")));
+                    }
+                    catch (JSONException t){
+                        t.printStackTrace();
+                    }
                 }
-                else {
-                    Toast toast = Toast.makeText(MedallasRecyclerView.this,"Medallas no encontradas",Toast.LENGTH_SHORT);
-                    Context context = getApplicationContext();
-                    int duration = Toast.LENGTH_SHORT;
-                    toast.show();
-                }}
+                else{
+                    showAlertDialog("This user doesn't exist");
+                }
+            }
 
             @Override
-            public void onFailure(Call<LinkedList<Medalla>> call, Throwable t) {
-                Toast toast = Toast.makeText(MedallasRecyclerView.this,"ERROR DE CONEXIÓN, no se ha podido realizar la petición.",Toast.LENGTH_SHORT);
-                toast.show();
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                t.printStackTrace();
+                showAlertDialog("No connection");
             }
         });
     }
+    public void doApiCallRepositories(String name){
+        Call<List<JsonObject>> call = API.getRepos(name);
+        call.enqueue(new Callback<List<JsonObject>>() {
+            @Override
+            public void onResponse(Call<List<JsonObject>> call, Response<List<JsonObject>> response) {
+                if(response.isSuccessful()){
+                    try{
+                        LinkedList<Repositorio> repositorios = new LinkedList<Repositorio>();
+                        for (int i = 0; i < response.body().size(); i++){
+                            JSONObject jsonObject = null;
+                            jsonObject = new JSONObject(new Gson().toJson(response.body().get(i)));
+
+                            Repositorio repo = new Repositorio();
+                            repo.setRepositoryName(jsonObject.getString("name"));
+                            repo.setLanguage(jsonObject.getString("language"));
+                            repositorioList.add(repo);
+                        }
+                    }
+                    catch (JSONException t){
+                        t.printStackTrace();
+                        showAlertDialog("Error creating the recyclerview");
+                    }
+                }
+                else{
+                    showAlertDialog("This user doesn't exist");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<JsonObject>> call, Throwable t) {
+                t.printStackTrace();
+                showAlertDialog("No connection");
+
+            }
+        });
+    }
+    public void showAlertDialog(String message){
+
+        alertBuilder.setTitle("Error");
+        alertBuilder.setMessage(message);
+        alertBuilder.setPositiveButton("Aceptar",null);
+        AlertDialog dialog = alertBuilder.create();
+        dialog.show();
+
+    }
+
 
 
 }

@@ -7,25 +7,29 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/perfil"
-        android:layout_width="140dp"
-        android:layout_height="77dp"
+        android:id="@+id/send"
+        android:layout_width="101dp"
+        android:layout_height="61dp"
         android:onClick="perfilClick"
-        android:text="PERFIL"
+        android:text="Send"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.82"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.52" />
+
+    <EditText
+        android:id="@+id/txtUserName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Name"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.42000002" />
 
-    <Button
-        android:id="@+id/insignias"
-        android:layout_width="138dp"
-        android:layout_height="80dp"
-        android:layout_marginTop="30dp"
-        android:onClick="insigniasClick"
-        android:text="INSIGNIAS"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/perfil" />
 </androidx.constraintlayout.widget.ConstraintLayout>
