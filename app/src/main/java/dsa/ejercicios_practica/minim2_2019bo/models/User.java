@@ -7,15 +7,17 @@ public class User {
     private String name;
     private int followers;
     private int following;
+    private String link;
     List<Repositorio> repositorios;
 
     public User(){}
-    public User(String name, int followers, int following, List<Repositorio> repositorios)
+    public User(String name, int followers, int following,String link, List<Repositorio> repositorios)
     {
         this();
         setName(name);
         setFollowers(followers);
         setFollowing(following);
+        setLink(link);
         setRepositorios(repositorios);
     }
 
@@ -49,5 +51,13 @@ public class User {
 
     public void setRepositorios(List<Repositorio> repositorios) {
         this.repositorios = repositorios;
+    }
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
     }
 }

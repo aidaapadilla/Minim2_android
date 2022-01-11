@@ -5,12 +5,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -83,6 +81,7 @@ public class MedallasRecyclerView extends AppCompatActivity {
 
         API = retrofit.create(GithubService.class);
     }
+
     public void doApiCall(String name){
         Call<JsonObject> call = API.getUser(name);
         call.enqueue(new Callback<JsonObject>() {
@@ -96,6 +95,9 @@ public class MedallasRecyclerView extends AppCompatActivity {
                         user.setFollowers(Integer.parseInt(jsonObject.getString("followers")));
                         user.setName(jsonObject.getString("login"));
                         user.setFollowing(Integer.parseInt(jsonObject.getString("following")));
+                        user.setLink(jsonObject.getString("avatar_url"));
+                        mAdapter.setUser(user);
+
                     }
                     catch (JSONException t){
                         t.printStackTrace();
@@ -130,6 +132,7 @@ public class MedallasRecyclerView extends AppCompatActivity {
                             repo.setLanguage(jsonObject.getString("language"));
                             repositorioList.add(repo);
                         }
+                        mAdapter.setData(repositorioList);
                     }
                     catch (JSONException t){
                         t.printStackTrace();
